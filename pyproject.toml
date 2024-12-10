@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "bishop"
+version = "0.1.0"
+description = "A moderation bot that allow to approve/remove reddit's post using Telegram"
+authors = ["Elxes, Fen0x"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+telethon = "^1.38.1"
+praw = "^7.8.1"
+asyncio = "^3.4.3"
+configparser = "^7.1.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
