@@ -4,7 +4,7 @@
     "post_removed": "Этот пост был удален за нарушение следующего правила:\n{rule_content}",
     "post_removed_ack": "Пост удален за нарушение правила {rule_number}.",
     "post_approved": "Пост одобрен.",
-    "log_delrule": "#delrule #log\n#ВремяНачала: {time_start} #ВремяКонца: {time_end} #Длительность: {duration:.2f} секунд\nID: {post_id}\nЗаголовок: {title}\nСсылка: {url}\nПричина: Правило {rule_number}\nСодержание: {rule_content}",
-    "log_appost": "#appost #log\n#ВремяНачала: {time_start} #ВремяКонца: {time_end} #Длительность: {duration:.2f} секунд\nID: {post_id}\nЗаголовок: {title}\nСсылка: {url}",
+    "log_delrule": "#delrule #log\nID: {post_id}\nЗаголовок: {title}\nСсылка: {url}\nПричина: Правило {rule_number}\nСодержание: {rule_content}",
+    "log_appost": "#appost #log\nID: {post_id}\nЗаголовок: {title}\nСсылка: {url}",
     "error_approving_post": "Ошибка при одобрении поста: {error}"
 }

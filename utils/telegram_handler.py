@@ -100,7 +100,7 @@ async def handle_telegram_events(event, reddit, log_chat_id):
 
         # Ensure the message is sent by the bot and contains expected link format
         if not message.out or "\nLink: " not in message.text:
-            await event.respond(translations["invalid_post_url"])
+            pass
             return
 
         try:
@@ -123,7 +123,6 @@ async def handle_telegram_events(event, reddit, log_chat_id):
                 await event.respond(translations["missing_rule_number"])
                 return
 
-            start_time = datetime.now()
             rule_number = event.raw_text.split("/delrule ")[1].strip()
 
             # Path to rules directory
@@ -142,17 +141,12 @@ async def handle_telegram_events(event, reddit, log_chat_id):
                 # Remove Reddit post and log the removal
                 submission.mod.remove()
                 submission.reply(translations["post_removed"].format(rule_content=rule_content))
-                end_time = datetime.now()
-                duration = (end_time - start_time).total_seconds()
 
                 # Send confirmation to Telegram
                 await event.respond(translations["post_removed_ack"].format(rule_number=rule_number))
                 await event.client.send_message(
                     log_chat_id,
                     translations["log_delrule"].format(
-                        time_start=format_timestamp(start_time),
-                        time_end=format_timestamp(end_time),
-                        duration=duration,
                         post_id=post_id,
                         title=submission.title,
                         url=submission.url,
@@ -165,20 +159,14 @@ async def handle_telegram_events(event, reddit, log_chat_id):
 
         # Handle the approve post command
         elif "/appost" in event.raw_text:
-            start_time = datetime.now()
             try:
                 submission.mod.approve()
-                end_time = datetime.now()
-                duration = (end_time - start_time).total_seconds()
 
                 # Log approved post action
                 await event.respond(translations["post_approved"])
                 await event.client.send_message(
                     log_chat_id,
                     translations["log_appost"].format(
-                        time_start=format_timestamp(start_time),
-                        time_end=format_timestamp(end_time),
-                        duration=duration,
                         post_id=post_id,
                         title=submission.title,
                         url=submission.url

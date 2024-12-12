@@ -4,7 +4,7 @@
     "post_removed": "This post has been removed for violating the following rule:\n{rule_content}",
     "post_removed_ack": "Post removed for violating rule {rule_number}.",
     "post_approved": "Post approved.",
-    "log_delrule": "#delrule #log\n#TimeStart: {time_start} #TimeEnd: {time_end} #Duration: {duration:.2f} seconds\nID: {post_id}\nTitle: {title}\nLink: {url}\nReason: Rule {rule_number}\nContent: {rule_content}",
-    "log_appost": "#appost #log\n#TimeStart: {time_start} #TimeEnd: {time_end} #Duration: {duration:.2f} seconds\nID: {post_id}\nTitle: {title}\nLink: {url}",
+    "log_delrule": "#delrule #log\nID: {post_id}\nTitle: {title}\nLink: {url}\nReason: Rule {rule_number}\nContent: {rule_content}",
+    "log_appost": "#appost #log\nID: {post_id}\nTitle: {title}\nLink: {url}",
     "error_approving_post": "Error while approving post: {error}"
 }
