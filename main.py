@@ -5,11 +5,11 @@ import praw                                                                     
 from telethon import TelegramClient, events                                     # Import Telethon for Telegram bot interactions
 from utils.reddit_handler import configure_reddit                               # Import function to configure Reddit
 from utils.telegram_handler import configure_telegram, handle_telegram_events   # Import functions to configure Telegram and handle events
+from datetime import datetime                                                   # Import datetime for timer calculations
 #################################################################################
 
-
 ###### VARIABLES ########
-sent_posts = set()      # Keep track of sent posts to avoid resending messages
+sent_posts = {}  # Keep track of sent posts and their timestamps
 #########################
 
 ################### MAIN FUNCTION ###############################################
@@ -30,7 +30,7 @@ async def main():
     # Set up Telegram event listener for new messages in the specified chat
     @telegram_client.on(events.NewMessage(chats=target_chat_id))
     async def handler(event):
-        await handle_telegram_events(event, reddit, log_chat_id)  # Handle Telegram events
+        await handle_telegram_events(event, reddit, log_chat_id, sent_posts)  # Pass sent_posts for tracking
 
     # Get the subreddit name from configuration settings
     subreddit_name = config["SETTINGS"]["subreddit"]
@@ -44,14 +44,15 @@ async def main():
         for item in subreddit.mod.modqueue(limit=None):
             if item.id not in sent_posts:  # Ensure posts are only sent once
                 if isinstance(item, praw.models.Submission):  # Handle Reddit submissions
+                    sent_posts[item.id] = datetime.now()  # Record the timestamp
                     await telegram_client.send_message(
                         target_chat_id, f"Post in modqueue:\nTitle: {item.title}\nLink: {item.url}\n"
                     )
                 elif isinstance(item, praw.models.Comment):  # Handle Reddit comments
+                    sent_posts[item.id] = datetime.now()  # Record the timestamp
                     await telegram_client.send_message(
                         target_chat_id, f"Comment in modqueue:\nAuthor: {item.author}\nBody: {item.body}\n"
                     )
-                sent_posts.add(item.id)  # Mark the post as sent
         await asyncio.sleep(10)  # Wait to prevent overloading the Reddit API
 
     # Keep the Telegram client connected until it is disconnected

@@ -4,7 +4,7 @@
     "post_removed": "Questo post è stato rimosso per aver violato la seguente regola:\n{rule_content}",
     "post_removed_ack": "Post rimosso per violazione della regola {rule_number}.",
     "post_approved": "Post approvato.",
-    "log_delrule": "#delrule #log\nID: {post_id}\nTitolo: {title}\nLink: {url}\nMotivo: Regola {rule_number}\nContenuto: {rule_content}",
-    "log_appost": "#appost #log\nID: {post_id}\nTitolo: {title}\nLink: {url}",
+    "log_delrule": "#delrule #log\nID: {post_id}\nTitolo: {title}\nLink: {url}\nMotivo: Regola {rule_number}\nContenuto: {rule_content}\nTempo impiegato: {time_taken}",
+    "log_appost": "#appost #log\nID: {post_id}\nTitolo: {title}\nLink: {url}\nTempo impiegato: {time_taken}",
     "error_approving_post": "Errore durante l'approvazione del post: {error}"
 }

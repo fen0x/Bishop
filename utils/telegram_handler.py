@@ -38,20 +38,6 @@ def generate_unique_id():
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
 
 
-# Format timestamp into a readable string
-def format_timestamp(ts):
-    """
-    Formats a datetime object into a string with the format 'YYYY-MM-DD HH:MM:SS'.
-    
-    Args:
-        ts (datetime): The timestamp to format.
-        
-    Returns:
-        str: Formatted timestamp string.
-    """
-    return ts.strftime("%Y-%m-%d %H:%M:%S")
-
-
 # Load translations from a JSON locale file
 def load_translations(locale):
     """
@@ -73,9 +59,38 @@ def load_translations(locale):
     except FileNotFoundError:
         raise ValueError(f"Translation file for locale '{locale}' not found.")
 
+# Format timestamp into a readable string
+def format_timestamp(ts):
+    """
+    Formats a datetime object into a string with the format 'YYYY-MM-DD HH:MM:SS'.
+    
+    Args:
+        ts (datetime): The timestamp to format.
+        
+    Returns:
+        str: Formatted timestamp string.
+    """
+    return ts.strftime("%Y-%m-%d %H:%M:%S")
+
+
+# Calculate time difference and return as hours, minutes, and seconds
+def calculate_time_difference(start_time):
+    """
+    Calculates the time difference between the start time and the current time.
+
+    Args:
+        start_time (datetime): The start time.
+
+    Returns:
+        str: The formatted time difference as 'HH:MM:SS'.
+    """
+    elapsed_time = datetime.now() - start_time
+    hours, remainder = divmod(elapsed_time.seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    return f"{hours:02}:{minutes:02}:{seconds:02}"
 
 # Handle Telegram events
-async def handle_telegram_events(event, reddit, log_chat_id):
+async def handle_telegram_events(event, reddit, log_chat_id, sent_posts):
     """
     Handles Telegram events, such as commands sent by the bot's user, processing Reddit submissions,
     and logging information into the designated log chat.
@@ -84,6 +99,7 @@ async def handle_telegram_events(event, reddit, log_chat_id):
         event (Event): The event triggered by Telegram.
         reddit (praw.Reddit): Reddit client instance to perform Reddit API operations.
         log_chat_id (int): ID of the Telegram chat used for logging.
+        sent_posts (dict): Dictionary containing sent posts and their timestamps.
     """
     config = configparser.ConfigParser()
     config.read("config.ini")
@@ -100,7 +116,6 @@ async def handle_telegram_events(event, reddit, log_chat_id):
 
         # Ensure the message is sent by the bot and contains expected link format
         if not message.out or "\nLink: " not in message.text:
-            pass
             return
 
         try:
@@ -115,7 +130,7 @@ async def handle_telegram_events(event, reddit, log_chat_id):
             await event.respond(translations["invalid_post_url"])
             return
 
-        post_id = generate_unique_id()  # Generate a unique ID for tracking purposes
+        post_id = submission.id
 
         # Handle the delete rule command
         if "/delrule" in event.raw_text:
@@ -142,6 +157,9 @@ async def handle_telegram_events(event, reddit, log_chat_id):
                 submission.mod.remove()
                 submission.reply(translations["post_removed"].format(rule_content=rule_content))
 
+                # Calculate time taken and log the action
+                time_taken = calculate_time_difference(sent_posts.pop(post_id, datetime.now()))
+
                 # Send confirmation to Telegram
                 await event.respond(translations["post_removed_ack"].format(rule_number=rule_number))
                 await event.client.send_message(
@@ -151,7 +169,8 @@ async def handle_telegram_events(event, reddit, log_chat_id):
                         title=submission.title,
                         url=submission.url,
                         rule_number=rule_number,
-                        rule_content=rule_content
+                        rule_content=rule_content,
+                        time_taken=time_taken
                     )
                 )
             except Exception as e:
@@ -162,6 +181,9 @@ async def handle_telegram_events(event, reddit, log_chat_id):
             try:
                 submission.mod.approve()
 
+                # Calculate time taken and log the action
+                time_taken = calculate_time_difference(sent_posts.pop(post_id, datetime.now()))
+
                 # Log approved post action
                 await event.respond(translations["post_approved"])
                 await event.client.send_message(
@@ -169,7 +191,8 @@ async def handle_telegram_events(event, reddit, log_chat_id):
                     translations["log_appost"].format(
                         post_id=post_id,
                         title=submission.title,
-                        url=submission.url
+                        url=submission.url,
+                        time_taken=time_taken
                     )
                 )
             except Exception as e:
